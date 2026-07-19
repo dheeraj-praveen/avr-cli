@@ -44,32 +44,54 @@ char USART_Receive(void){
 
 void Com_Prompt(void){
 
+    USART_SendString("\n");
+
     USART_SendString(">");
 
 }
 
 int main(void){
 
-    Com_Prompt();
-
     USART_Init();
+
+    char buffer[32];
+
+    uint8_t index = 0;
+
+    Com_Prompt();
 
     while(1){
 
-        char buffer = USART_Receive();
+        char c = USART_Receive();
 
-        if (buffer != '\n' || buffer != '\r'){
+        if (c != '\r' && c != '\r\n'){
 
-            USART_Transmit(buffer);
+            buffer[index] = c;
+
+            index += 1;
 
         }
 
         else{
 
+            buffer[index] = '\0';
+
+            USART_SendString("\r\n");
+
+            USART_SendString(buffer);    
             
+            USART_SendString("\r\n");
+
+            index = 0;
+
+            Com_Prompt();
 
         }
+
+
     }
+
+    
 
     return 0;
 }
